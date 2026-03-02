@@ -22,10 +22,6 @@ const ALIASES: Record<string, string[]> = {
     "precio venta", "precio_venta", "pventa", "precio de venta", "precio",
     "venta", "sale price", "p venta", "precio final", "p. venta",
   ],
-  precio_costo: [
-    "precio costo", "precio_costo", "pcosto", "precio de costo", "costo",
-    "cost", "cost price", "p costo", "p. costo",
-  ],
   stock: [
     "stock", "stock actual", "stock_actual", "cantidad", "qty",
     "quantity", "existencia", "existencias", "inventario",
@@ -43,10 +39,7 @@ const ALIASES: Record<string, string[]> = {
     "location", "estante", "deposito", "depósito", "pasillo", "sector",
     "shelf", "bin", "slot",
   ],
-  proveedor: [
-    "proveedor", "proveedor nombre", "supplier", "fabricante", "marca",
-    "brand",
-  ],
+
 }
 
 // ─────────────────────────────────────────────
@@ -62,12 +55,10 @@ export interface FilaProducto {
   codigo?: string
   categoria?: string
   precio_venta?: number
-  precio_costo?: number
   stock?: number
   stock_minimo?: number
   ubicacion_fisica?: string
   descripcion?: string
-  proveedor?: string
 }
 
 /** Resultado de validar una fila */
@@ -86,12 +77,10 @@ export interface ProductoParaImportar {
   codigo?: string
   categoria?: string
   precio_venta: number
-  precio_costo?: number
   stock: number
   stock_minimo: number
   ubicacion_fisica?: string
   descripcion?: string
-  proveedor?: string
 }
 
 // ─────────────────────────────────────────────
@@ -231,12 +220,10 @@ export function mapearFila(row: ExcelRow, mapeo: Record<string, string>): FilaPr
     codigo: limpiarTexto(get("codigo")),
     categoria: limpiarTexto(get("categoria")),
     precio_venta: parsearNumero(get("precio_venta")),
-    precio_costo: parsearNumero(get("precio_costo")),
     stock: parsearEntero(get("stock")),
     stock_minimo: parsearEntero(get("stock_minimo")),
     ubicacion_fisica: limpiarTexto(get("ubicacion_fisica")),
     descripcion: limpiarTexto(get("descripcion")),
-    proveedor: limpiarTexto(get("proveedor")),
   }
 }
 
@@ -266,11 +253,6 @@ export function validarFilas(filas: FilaProducto[]): FilaValidada[] {
       errores.push("El precio de venta es obligatorio")
     } else if (datos.precio_venta <= 0) {
       errores.push("El precio de venta debe ser mayor a 0")
-    }
-
-    // ── Precio de costo ─────────────────────
-    if (datos.precio_costo !== undefined && datos.precio_costo < 0) {
-      errores.push("El precio de costo no puede ser negativo")
     }
 
     // ── Stock ────────────────────────────────

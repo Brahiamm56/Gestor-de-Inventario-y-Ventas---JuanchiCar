@@ -194,7 +194,6 @@ export default function ImportProductosModal({
         stock: f.datos.stock ?? 0,
         stock_minimo: f.datos.stock_minimo ?? 5,
         descripcion: f.datos.descripcion,
-        proveedor: f.datos.proveedor,
       }))
 
     if (filasParaImportar.length === 0) {
@@ -227,25 +226,21 @@ export default function ImportProductosModal({
         "Código",
         "Categoría",
         "Precio Venta",
-        "Precio Costo",
         "Stock",
         "Stock Mínimo",
         "Descripción",
-        "Proveedor",
       ],
-      ["Aceite 10W40 1L", "ACE-001", "Lubricantes", 850, 500, 10, 3, "Aceite sintético", "YPF"],
-      ["Filtro de Aceite", "FIL-001", "Filtros", 450, 250, 5, 2, "", "Bosch"],
+      ["Aceite 10W40 1L", "ACE-001", "Lubricantes", 850, 10, 3, "Aceite sintético"],
+      ["Filtro de Aceite", "FIL-001", "Filtros", 450, 5, 2, ""],
     ])
     ws["!cols"] = [
       { wch: 25 },
       { wch: 12 },
       { wch: 15 },
       { wch: 12 },
-      { wch: 12 },
       { wch: 8 },
       { wch: 12 },
       { wch: 30 },
-      { wch: 15 },
     ]
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, "Productos")
@@ -373,11 +368,9 @@ export default function ImportProductosModal({
                     "Código",
                     "Categoría",
                     "Precio Venta *",
-                    "Precio Costo",
                     "Stock",
                     "Stock Mínimo",
                     "Descripción",
-                    "Proveedor",
                   ].map((col) => (
                     <Badge
                       key={col}

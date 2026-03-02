@@ -84,7 +84,7 @@ export async function eliminarProducto(id: string) {
 
 /**
  * Importa productos en lote desde un archivo Excel/CSV parseado en el cliente.
- * Verifica duplicados de código en la DB e intenta mapear proveedores por nombre.
+ * Verifica duplicados de código en la DB.
  */
 export async function importarProductos(filas: ProductoParaImportar[]): Promise<
   | { error: string }
@@ -117,20 +117,6 @@ export async function importarProductos(filas: ProductoParaImportar[]): Promise<
     })
   }
 
-  // ── Intentar resolver proveedores por nombre ──────────────────────────
-  const nombresProveedor = [
-    ...new Set(filas.map((f) => f.proveedor).filter((p): p is string => !!p)),
-  ]
-  const proveedorMap = new Map<string, string>()
-  if (nombresProveedor.length > 0) {
-    const { data: proveedoresData } = await supabase
-      .from("proveedores")
-      .select("id, nombre")
-    proveedoresData?.forEach((p) => {
-      proveedorMap.set(p.nombre.toLowerCase(), p.id)
-    })
-  }
-
   // ── Separar válidos de omitidos ───────────────────────────────────────
   const detalleOmitidos: Array<{ fila: number; motivo: string }> = []
   const paraInsertar: Array<{
@@ -142,7 +128,6 @@ export async function importarProductos(filas: ProductoParaImportar[]): Promise<
     stock_minimo: number
     ubicacion_fisica: string | null
     descripcion: string | null
-    proveedor_id: string | null
   }> = []
 
   filas.forEach((f, i) => {
@@ -157,10 +142,6 @@ export async function importarProductos(filas: ProductoParaImportar[]): Promise<
       return
     }
 
-    const proveedorId = f.proveedor
-      ? (proveedorMap.get(f.proveedor.toLowerCase()) ?? null)
-      : null
-
     paraInsertar.push({
       nombre: f.nombre,
       codigo: f.codigo ?? null,
@@ -170,7 +151,6 @@ export async function importarProductos(filas: ProductoParaImportar[]): Promise<
       stock_minimo: f.stock_minimo,
       ubicacion_fisica: f.ubicacion_fisica ?? null,
       descripcion: f.descripcion ?? null,
-      proveedor_id: proveedorId,
     })
   })
 
