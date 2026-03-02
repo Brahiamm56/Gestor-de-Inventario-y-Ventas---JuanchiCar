@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
-import { Search, Plus, Pencil, Trash2, Calendar, Car, User, Filter } from "lucide-react"
+import { useState, useMemo, useEffect, useTransition } from "react"
+import { Search, Plus, Pencil, Trash2, Calendar, Car, User, Filter, Clock, Play, CheckCircle, XCircle } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -26,6 +27,7 @@ import Pagination from "@/components/shared/Pagination"
 import { usePagination } from "@/hooks/usePagination"
 import { useDebounce } from "@/hooks/useDebounce"
 import type { Cliente, Auto, TurnoConDetalles, EstadoTurno } from "@/types/database"
+import { cambiarEstadoTurno } from "@/app/(dashboard)/taller/actions"
 import TurnoModal from "./TurnoModal"
 import DeleteTurnoDialog from "./DeleteTurnoDialog"
 
@@ -50,6 +52,7 @@ export default function TurnoTable({ turnos, clientes, autos }: TurnoTableProps)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingTurno, setEditingTurno] = useState<TurnoConDetalles | null>(null)
   const [deletingTurno, setDeletingTurno] = useState<TurnoConDetalles | null>(null)
+  const [isPendingEstado, startTransitionEstado] = useTransition()
 
   const filtered = useMemo(() => {
     return turnos.filter((t) => {
@@ -78,6 +81,23 @@ export default function TurnoTable({ turnos, clientes, autos }: TurnoTableProps)
   function handleCloseModal() {
     setModalOpen(false)
     setEditingTurno(null)
+  }
+
+  function handleCambiarEstado(turnoId: string, nuevoEstado: EstadoTurno) {
+    startTransitionEstado(async () => {
+      const result = await cambiarEstadoTurno(turnoId, nuevoEstado)
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+      const labels: Record<string, string> = {
+        pendiente: "Pendiente",
+        en_progreso: "En progreso",
+        completado: "Completado",
+        cancelado: "Cancelado",
+      }
+      toast.success(`Estado cambiado a ${labels[nuevoEstado]}`)
+    })
   }
 
   return (
@@ -112,7 +132,7 @@ export default function TurnoTable({ turnos, clientes, autos }: TurnoTableProps)
           className="gap-2 cursor-pointer bg-[#1E3A5F] text-white hover:bg-[#2d4a6f] text-white"
         >
           <Plus className="size-4" />
-          Nuevo Turno
+          Nuevo Auto
         </Button>
       </div>
 
@@ -131,7 +151,7 @@ export default function TurnoTable({ turnos, clientes, autos }: TurnoTableProps)
                 <TableHeader>
                   <TableRow className="hover:bg-transparent bg-slate-50">
                     <TableHead className="text-slate-500">Cliente / Vehículo</TableHead>
-                    <TableHead className="text-slate-500">Descripción del Trabajo</TableHead>
+                    <TableHead className="text-slate-500">Problema / Trabajo</TableHead>
                     <TableHead className="text-slate-500">Fecha / Hora</TableHead>
                     <TableHead className="text-slate-500">Estado</TableHead>
                     <TableHead className="text-right text-slate-500">Acciones</TableHead>
@@ -155,8 +175,8 @@ export default function TurnoTable({ turnos, clientes, autos }: TurnoTableProps)
                           </div>
                         </TableCell>
                         <TableCell className="py-4">
-                          <p className="text-slate-700 line-clamp-1">{turno.descripcion}</p>
-                          {turno.notas && <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{turno.notas}</p>}
+                          <p className="text-slate-700 line-clamp-1">{turno.notas || "Sin problema reportado"}</p>
+                          {turno.descripcion && <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">Trabajo: {turno.descripcion}</p>}
                         </TableCell>
                         <TableCell className="py-4 whitespace-nowrap">
                           <div className="flex items-center gap-1.5 text-slate-700">
@@ -175,11 +195,50 @@ export default function TurnoTable({ turnos, clientes, autos }: TurnoTableProps)
                         </TableCell>
                         <TableCell className="py-4 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-1">
+                            {/* Botones de acción rápida de estado */}
+                            {turno.estado !== "pendiente" && turno.estado !== "cancelado" && (
+                              <Button
+                                variant="ghost"
+                                size="icon-xs"
+                                onClick={() => handleCambiarEstado(turno.id, "pendiente")}
+                                disabled={isPendingEstado}
+                                title="Pasar a Pendiente"
+                                className="cursor-pointer"
+                              >
+                                <Clock className="size-3.5 text-amber-500" />
+                              </Button>
+                            )}
+                            {turno.estado !== "en_progreso" && turno.estado !== "cancelado" && (
+                              <Button
+                                variant="ghost"
+                                size="icon-xs"
+                                onClick={() => handleCambiarEstado(turno.id, "en_progreso")}
+                                disabled={isPendingEstado}
+                                title="Pasar a En Progreso"
+                                className="cursor-pointer"
+                              >
+                                <Play className="size-3.5 text-blue-500" />
+                              </Button>
+                            )}
+                            {turno.estado !== "completado" && turno.estado !== "cancelado" && (
+                              <Button
+                                variant="ghost"
+                                size="icon-xs"
+                                onClick={() => handleCambiarEstado(turno.id, "completado")}
+                                disabled={isPendingEstado}
+                                title="Pasar a Completado"
+                                className="cursor-pointer"
+                              >
+                                <CheckCircle className="size-3.5 text-green-500" />
+                              </Button>
+                            )}
+                            <div className="w-px h-4 bg-slate-200 mx-0.5" />
                             <Button
                               variant="ghost"
                               size="icon-xs"
                               onClick={() => handleEdit(turno)}
                               className="cursor-pointer"
+                              title="Editar"
                             >
                               <Pencil className="size-3.5 text-slate-500" />
                             </Button>
@@ -188,6 +247,7 @@ export default function TurnoTable({ turnos, clientes, autos }: TurnoTableProps)
                               size="icon-xs"
                               onClick={() => setDeletingTurno(turno)}
                               className="cursor-pointer"
+                              title="Eliminar"
                             >
                               <Trash2 className="size-3.5 text-red-500" />
                             </Button>

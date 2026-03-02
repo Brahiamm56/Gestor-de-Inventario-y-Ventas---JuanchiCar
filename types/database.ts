@@ -63,23 +63,6 @@ export interface Proveedor {
   created_at: string
 }
 
-export interface Compra {
-  id: string
-  proveedor_id: string
-  fecha: string
-  total: number
-  notas: string | null
-  created_at: string
-}
-
-export interface CompraItem {
-  id: string
-  compra_id: string
-  producto_id: string
-  cantidad: number
-  precio_unitario: number
-}
-
 // Venta con datos del cliente y auto para listados
 export interface VentaConCliente extends Venta {
   clientes: Pick<Cliente, "nombre"> | null
@@ -120,8 +103,6 @@ export interface Database {
       ventas: { Row: Venta; Insert: Partial<Venta>; Update: Partial<Venta> }
       venta_items: { Row: VentaItem; Insert: Partial<VentaItem>; Update: Partial<VentaItem> }
       proveedores: { Row: Proveedor; Insert: Partial<Proveedor>; Update: Partial<Proveedor> }
-      compras: { Row: Compra; Insert: Partial<Compra>; Update: Partial<Compra> }
-      compra_items: { Row: CompraItem; Insert: Partial<CompraItem>; Update: Partial<CompraItem> }
       turnos_taller: { Row: TurnoTaller; Insert: Partial<TurnoTaller>; Update: Partial<TurnoTaller> }
     }
     Views: {

@@ -44,7 +44,7 @@ export async function crearTurno(formData: unknown) {
     const { error } = await supabase.from("turnos_taller").insert({
         cliente_id: parsed.data.cliente_id || null,
         auto_id: parsed.data.auto_id || null,
-        descripcion: parsed.data.descripcion,
+        descripcion: parsed.data.descripcion || "",
         estado: parsed.data.estado,
         fecha_turno: parsed.data.fecha_turno,
         fecha_entrega: parsed.data.fecha_entrega || null,
@@ -73,7 +73,7 @@ export async function editarTurno(id: string, formData: unknown) {
         .update({
             cliente_id: parsed.data.cliente_id || null,
             auto_id: parsed.data.auto_id || null,
-            descripcion: parsed.data.descripcion,
+            descripcion: parsed.data.descripcion || "",
             estado: parsed.data.estado,
             fecha_turno: parsed.data.fecha_turno,
             fecha_entrega: parsed.data.fecha_entrega || null,

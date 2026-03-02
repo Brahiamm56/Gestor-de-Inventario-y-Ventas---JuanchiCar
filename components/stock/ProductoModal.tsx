@@ -40,7 +40,10 @@ import type { Producto, Proveedor } from "@/types/database"
 // Constantes
 // ─────────────────────────────────────────────
 
+const SIN_CATEGORIA = "Sin categoría"
+
 const CATEGORIAS_PREDEFINIDAS = [
+  SIN_CATEGORIA,
   "Filtros",
   "Frenos",
   "Motor",
@@ -133,7 +136,7 @@ export default function ProductoModal({
       setIsCustomCategory(false)
       reset({
         nombre: "",
-        categoria: "",
+        categoria: SIN_CATEGORIA,
         codigo: "",
         precio_venta: "" as unknown as number,
         precio_costo: "" as unknown as number,

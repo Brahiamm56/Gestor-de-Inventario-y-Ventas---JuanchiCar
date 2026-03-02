@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useTransition } from "react"
-import { Loader2, Plus, Trash2, Wrench } from "lucide-react"
+import { Loader2, Plus, Trash2, Wrench, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import VentaItems from "./VentaItems"
-import { crearVenta, editarVenta } from "@/app/(dashboard)/ventas/actions"
+import { crearVenta, editarVenta, crearClienteRapido } from "@/app/(dashboard)/ventas/actions"
 import type { Cliente, Auto, Producto } from "@/types/database"
 import type { VentaItemFormData, ServicioItemFormData } from "@/schemas/venta"
 import { formatARS } from "@/lib/utils"
@@ -68,7 +68,19 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
   const [servicios, setServicios] = useState<ServicioItemFormData[]>([])
   const [error, setError] = useState("")
 
+  // Estado para agregar cliente inline
+  const [showNuevoCliente, setShowNuevoCliente] = useState(false)
+  const [nuevoClienteNombre, setNuevoClienteNombre] = useState("")
+  const [nuevoClienteTelefono, setNuevoClienteTelefono] = useState("")
+  const [creandoCliente, setCreandoCliente] = useState(false)
+  const [clientesLocal, setClientesLocal] = useState<Cliente[]>(clientes)
+
   const isEditing = !!ventaEdit
+
+  // Sincronizar clientes prop con estado local
+  useEffect(() => {
+    setClientesLocal(clientes)
+  }, [clientes])
 
   // Filtrar autos del cliente seleccionado
   const clienteAutos = autos.filter((a) => a.cliente_id === clienteId)
@@ -94,6 +106,9 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
       setItems([])
       setServicios([])
       setError("")
+      setShowNuevoCliente(false)
+      setNuevoClienteNombre("")
+      setNuevoClienteTelefono("")
     }
   }, [open, ventaEdit])
 
@@ -101,6 +116,43 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
   useEffect(() => {
     if (!ventaEdit) setAutoId("")
   }, [clienteId, ventaEdit])
+
+  // Crear cliente rápido desde la modal de ventas
+  async function handleCrearClienteRapido() {
+    if (!nuevoClienteNombre.trim()) {
+      toast.error("El nombre del cliente es obligatorio")
+      return
+    }
+    setCreandoCliente(true)
+    const result = await crearClienteRapido({
+      nombre: nuevoClienteNombre.trim(),
+      telefono: nuevoClienteTelefono.trim() || undefined,
+    })
+    setCreandoCliente(false)
+
+    if (result.error) {
+      toast.error(result.error)
+      return
+    }
+
+    if (result.cliente) {
+      // Agregar al listado local y seleccionarlo
+      const newCliente: Cliente = {
+        id: result.cliente.id,
+        nombre: result.cliente.nombre,
+        telefono: nuevoClienteTelefono.trim() || null,
+        email: null,
+        created_at: new Date().toISOString(),
+      }
+      setClientesLocal((prev) => [...prev, newCliente].sort((a, b) => a.nombre.localeCompare(b.nombre)))
+      setClienteId(result.cliente.id)
+      toast.success(`Cliente "${result.cliente.nombre}" creado`)
+    }
+
+    setShowNuevoCliente(false)
+    setNuevoClienteNombre("")
+    setNuevoClienteTelefono("")
+  }
 
   function addServicio() {
     setServicios((prev) => [...prev, { descripcion: "", precio: 0 }])
@@ -172,17 +224,66 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Cliente</Label>
-              <Select value={clienteId || "none"} onValueChange={(v) => setClienteId(v === "none" ? "" : v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar cliente" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sin cliente</SelectItem>
-                  {clientes.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-1.5">
+                <Select value={clienteId || "none"} onValueChange={(v) => setClienteId(v === "none" ? "" : v)}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Seleccionar cliente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sin cliente</SelectItem>
+                    {clientesLocal.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowNuevoCliente(!showNuevoCliente)}
+                  title="Agregar nuevo cliente"
+                  className="shrink-0"
+                >
+                  <UserPlus className="size-4 text-slate-600" />
+                </Button>
+              </div>
+              {showNuevoCliente && (
+                <div className="rounded-lg border border-slate-200 p-3 space-y-2 bg-slate-50/50 mt-1.5">
+                  <p className="text-xs font-medium text-slate-700">Nuevo cliente</p>
+                  <Input
+                    placeholder="Nombre del cliente *"
+                    value={nuevoClienteNombre}
+                    onChange={(e) => setNuevoClienteNombre(e.target.value)}
+                    className="h-8 text-sm"
+                  />
+                  <Input
+                    placeholder="Teléfono (opcional)"
+                    value={nuevoClienteTelefono}
+                    onChange={(e) => setNuevoClienteTelefono(e.target.value)}
+                    className="h-8 text-sm"
+                  />
+                  <div className="flex justify-end gap-1.5">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => { setShowNuevoCliente(false); setNuevoClienteNombre(""); setNuevoClienteTelefono("") }}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleCrearClienteRapido}
+                      disabled={creandoCliente || !nuevoClienteNombre.trim()}
+                      className="bg-[#1E3A5F] text-white hover:bg-[#2d4a6f]"
+                    >
+                      {creandoCliente && <Loader2 className="size-3 animate-spin" />}
+                      Crear
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-1.5">

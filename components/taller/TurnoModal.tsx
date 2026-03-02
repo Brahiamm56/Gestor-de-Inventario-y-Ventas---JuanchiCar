@@ -145,7 +145,7 @@ export default function TurnoModal({ open, onClose, turno, clientes, autos }: Tu
                     toast.error(result.error)
                     return
                 }
-                toast.success(isEditing ? "Turno actualizado" : "Turno creado")
+                toast.success(isEditing ? "Auto actualizado" : "Auto ingresado")
                 onClose()
                 return
             }
@@ -158,7 +158,7 @@ export default function TurnoModal({ open, onClose, turno, clientes, autos }: Tu
                 toast.error(result.error)
                 return
             }
-            toast.success(isEditing ? "Turno actualizado" : "Turno creado")
+            toast.success(isEditing ? "Auto actualizado" : "Auto ingresado")
             onClose()
         })
     }
@@ -167,7 +167,7 @@ export default function TurnoModal({ open, onClose, turno, clientes, autos }: Tu
         <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
             <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{isEditing ? "Editar Turno" : "Nuevo Turno"}</DialogTitle>
+                    <DialogTitle>{isEditing ? "Editar Auto" : "Nuevo Auto"}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-2">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -310,15 +310,26 @@ export default function TurnoModal({ open, onClose, turno, clientes, autos }: Tu
                             )}
                         </div>
 
-                        {/* Descripción */}
+                        {/* Problema del cliente — campo obligatorio */}
                         <div className="space-y-1.5 sm:col-span-2">
-                            <Label htmlFor="descripcion">Descripción del trabajo *</Label>
+                            <Label htmlFor="notas">Problema del cliente *</Label>
+                            <Textarea
+                                id="notas"
+                                placeholder="Describí el problema que reporta el cliente..."
+                                className="resize-none h-20"
+                                {...register("notas")}
+                            />
+                            {errors.notas && <p className="text-xs text-red-500">{errors.notas.message}</p>}
+                        </div>
+
+                        {/* Descripción del trabajo — campo opcional */}
+                        <div className="space-y-1.5 sm:col-span-2">
+                            <Label htmlFor="descripcion">Descripción del trabajo realizado (opcional)</Label>
                             <Input
                                 id="descripcion"
                                 placeholder="Ej: Cambio de aceite y filtros, tren delantero..."
                                 {...register("descripcion")}
                             />
-                            {errors.descripcion && <p className="text-xs text-red-500">{errors.descripcion.message}</p>}
                         </div>
 
                         {/* Fecha Turno */}
@@ -361,16 +372,6 @@ export default function TurnoModal({ open, onClose, turno, clientes, autos }: Tu
                             />
                         </div>
 
-                        {/* Notas */}
-                        <div className="space-y-1.5 sm:col-span-2">
-                            <Label htmlFor="notas">Notas adicionales</Label>
-                            <Textarea
-                                id="notas"
-                                placeholder="Detalles técnicos, repuestos necesarios, etc."
-                                className="resize-none h-20"
-                                {...register("notas")}
-                            />
-                        </div>
                     </div>
 
                     <div className="flex justify-end gap-2 pt-2 border-t mt-4">
@@ -379,7 +380,7 @@ export default function TurnoModal({ open, onClose, turno, clientes, autos }: Tu
                         </Button>
                         <Button type="submit" disabled={isPending} style={{ backgroundColor: "#1E3A5F" }}>
                             {isPending && <Loader2 className="size-4 animate-spin" />}
-                            {isEditing ? "Guardar cambios" : "Crear turno"}
+                            {isEditing ? "Guardar cambios" : "Ingresar auto"}
                         </Button>
                     </div>
                 </form>

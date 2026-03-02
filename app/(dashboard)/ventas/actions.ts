@@ -3,6 +3,31 @@
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { ventaSchema } from "@/schemas/venta"
+import { clienteSchema } from "@/schemas/cliente"
+
+// Crea un cliente rápido desde la modal de ventas y devuelve su id
+export async function crearClienteRapido(formData: unknown) {
+  const parsed = clienteSchema.safeParse(formData)
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0].message }
+  }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("clientes")
+    .insert({
+      nombre: parsed.data.nombre,
+      telefono: parsed.data.telefono || null,
+    })
+    .select("id, nombre")
+    .single()
+
+  if (error) return { error: "Error al crear el cliente" }
+
+  revalidatePath("/clientes")
+  revalidatePath("/ventas")
+  return { success: true, cliente: data }
+}
 
 // Codifica servicios en el campo notas para no requerir migración de DB
 function encodeNotasConServicios(

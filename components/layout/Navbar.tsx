@@ -23,7 +23,6 @@ const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/stock", label: "Stock/Inventario" },
   { href: "/ventas", label: "Ventas" },
-  { href: "/compras", label: "Compras" },
   { href: "/clientes", label: "Clientes" },
   { href: "/taller", label: "Taller" },
   { href: "/proveedores", label: "Proveedores" },

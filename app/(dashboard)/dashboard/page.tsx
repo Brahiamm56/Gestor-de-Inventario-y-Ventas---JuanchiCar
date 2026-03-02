@@ -188,27 +188,20 @@ export default async function DashboardPage() {
   const last6 = getLast6Months()
   const monthlyResults = await Promise.all(
     last6.map((month) =>
-      Promise.all([
-        supabase
-          .from("ventas")
-          .select("total")
-          .eq("estado", "confirmada")
-          .gte("fecha", month.start)
-          .lte("fecha", month.end),
-        supabase
-          .from("compras")
-          .select("total")
-          .gte("fecha", month.start)
-          .lte("fecha", month.end),
-      ])
+      supabase
+        .from("ventas")
+        .select("total")
+        .eq("estado", "confirmada")
+        .gte("fecha", month.start)
+        .lte("fecha", month.end)
     )
   )
   const ingresosVsGastos = last6.map((month, i) => {
-    const [ventasMonth, comprasMonth] = monthlyResults[i]
+    const ventasMonth = monthlyResults[i]
     return {
       mes: month.label,
       ingresos: (ventasMonth.data ?? []).reduce((s, v) => s + Number(v.total), 0),
-      gastos: (comprasMonth.data ?? []).reduce((s, c) => s + Number(c.total), 0),
+      gastos: 0,
     }
   })
 
