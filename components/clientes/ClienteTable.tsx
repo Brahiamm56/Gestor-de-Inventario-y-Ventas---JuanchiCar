@@ -28,7 +28,7 @@ import { usePagination } from "@/hooks/usePagination"
 import { useDebounce } from "@/hooks/useDebounce"
 import { eliminarCliente } from "@/app/(dashboard)/clientes/actions"
 import { exportarCSV } from "@/lib/exportCSV"
-import type { Cliente, Auto, Venta } from "@/types/database"
+import type { Cliente, Auto, Venta, TurnoTaller } from "@/types/database"
 
 interface VentaConAuto extends Venta {
   autos: { patente: string } | null
@@ -38,9 +38,10 @@ interface ClienteTableProps {
   clientes: Cliente[]
   autos: Auto[]
   ventas: VentaConAuto[]
+  turnos: TurnoTaller[]
 }
 
-export default function ClienteTable({ clientes, autos, ventas }: ClienteTableProps) {
+export default function ClienteTable({ clientes, autos, ventas, turnos }: ClienteTableProps) {
   const [search, setSearch] = useState("")
   const debouncedSearch = useDebounce(search)
   const [modalOpen, setModalOpen] = useState(false)
@@ -52,6 +53,7 @@ export default function ClienteTable({ clientes, autos, ventas }: ClienteTablePr
   const autosMap = useMemo(() => {
     const map = new Map<string, Auto[]>()
     autos.forEach((a) => {
+      if (!a.cliente_id) return
       const list = map.get(a.cliente_id) ?? []
       list.push(a)
       map.set(a.cliente_id, list)
@@ -70,6 +72,18 @@ export default function ClienteTable({ clientes, autos, ventas }: ClienteTablePr
     })
     return map
   }, [ventas])
+
+  const turnosMap = useMemo(() => {
+    const map = new Map<string, TurnoTaller[]>()
+    turnos.forEach((t) => {
+      if (t.auto_id) {
+        const list = map.get(t.auto_id) ?? []
+        list.push(t)
+        map.set(t.auto_id, list)
+      }
+    })
+    return map
+  }, [turnos])
 
   const filtered = useMemo(() => {
     if (!debouncedSearch) return clientes
@@ -216,6 +230,7 @@ export default function ClienteTable({ clientes, autos, ventas }: ClienteTablePr
                               clienteNombre={cliente.nombre}
                               autos={clienteAutos}
                               ventas={clienteVentas}
+                              turnosMap={turnosMap}
                             />
                           </TableCell>
                         </TableRow>

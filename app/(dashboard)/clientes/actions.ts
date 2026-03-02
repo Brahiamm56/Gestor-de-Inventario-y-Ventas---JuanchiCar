@@ -14,7 +14,6 @@ export async function crearCliente(formData: unknown) {
   const { error } = await supabase.from("clientes").insert({
     nombre: parsed.data.nombre,
     telefono: parsed.data.telefono || null,
-    email: parsed.data.email || null,
   })
 
   if (error) return { error: "Error al crear el cliente" }
@@ -35,7 +34,6 @@ export async function editarCliente(id: string, formData: unknown) {
     .update({
       nombre: parsed.data.nombre,
       telefono: parsed.data.telefono || null,
-      email: parsed.data.email || null,
     })
     .eq("id", id)
 

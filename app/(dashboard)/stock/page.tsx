@@ -1,4 +1,4 @@
-import { Package, TrendingUp, AlertTriangle, Boxes } from "lucide-react"
+import { Archive, TrendingUp, AlertTriangle, Boxes } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import ProductoTable from "@/components/stock/ProductoTable"
 import { formatARS } from "@/lib/utils"
@@ -8,7 +8,7 @@ export default async function StockPage() {
   const supabase = await createClient()
 
   const [productosResult, proveedoresResult] = await Promise.all([
-    supabase.from("productos").select("*").order("nombre"),
+    supabase.from("productos").select("*").eq("is_active", true).order("nombre"),
     supabase.from("proveedores").select("*").order("nombre"),
   ])
 
@@ -25,7 +25,7 @@ export default async function StockPage() {
       <div className="animate-fade-in-down">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg" style={{ backgroundColor: "#F3E8FF" }}>
-            <Package className="size-6 text-purple-600" />
+            <Archive className="size-6 text-purple-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">

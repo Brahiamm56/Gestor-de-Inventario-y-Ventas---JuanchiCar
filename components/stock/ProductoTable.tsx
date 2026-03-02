@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { Search, Plus, Pencil, Trash2, Package, Download } from "lucide-react"
+import { Search, Plus, Pencil, Trash2, Package, Download, FileUp, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table"
 import ProductoModal from "./ProductoModal"
 import DeleteProductoDialog from "./DeleteProductoDialog"
+import ImportProductosModal from "./ImportProductosModal"
 import Pagination from "@/components/shared/Pagination"
 import { usePagination } from "@/hooks/usePagination"
 import { useDebounce } from "@/hooks/useDebounce"
@@ -50,6 +51,7 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
   const [categoriaFilter, setCategoriaFilter] = useState("todas")
   const [stockFilter, setStockFilter] = useState("todos")
   const [modalOpen, setModalOpen] = useState(false)
+  const [importModalOpen, setImportModalOpen] = useState(false)
   const [editingProducto, setEditingProducto] = useState<Producto | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Producto | null>(null)
 
@@ -142,6 +144,15 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
           <span className="hidden sm:inline">CSV</span>
         </Button>
         <Button
+          variant="outline"
+          onClick={() => setImportModalOpen(true)}
+          className="shrink-0"
+          title="Importar productos desde Excel"
+        >
+          <FileUp className="size-4" />
+          <span className="hidden sm:inline">Importar</span>
+        </Button>
+        <Button
           onClick={() => { setEditingProducto(null); setModalOpen(true) }}
           className="shrink-0 bg-[#1E3A5F] text-white hover:bg-[#2d4a6f]"
         >
@@ -175,6 +186,7 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
                     <TableHead className="text-right min-w-[100px] text-slate-500">Ganancia</TableHead>
                     <TableHead className="text-center min-w-[70px] text-slate-500">Stock</TableHead>
                     <TableHead className="min-w-[80px] text-slate-500">Estado</TableHead>
+                    <TableHead className="min-w-[110px] text-slate-500">Ubicación</TableHead>
                     <TableHead className="min-w-[120px] text-slate-500">Proveedor</TableHead>
                     <TableHead className="text-right min-w-[80px] text-slate-500">Acciones</TableHead>
                   </TableRow>
@@ -214,6 +226,16 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
                           >
                             {badge.label}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="py-4 text-slate-500">
+                          {producto.ubicacion_fisica ? (
+                            <span className="inline-flex items-center gap-1">
+                              <MapPin className="size-3 text-slate-400 shrink-0" />
+                              <span className="text-sm">{producto.ubicacion_fisica}</span>
+                            </span>
+                          ) : (
+                            <span className="text-slate-400">—</span>
+                          )}
                         </TableCell>
                         <TableCell className="py-4 text-slate-500">
                           {producto.proveedor_id ? (
@@ -266,6 +288,11 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
         onClose={() => { setModalOpen(false); setEditingProducto(null) }}
         producto={editingProducto}
         proveedores={proveedores}
+      />
+
+      <ImportProductosModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
       />
 
       {deleteTarget && (

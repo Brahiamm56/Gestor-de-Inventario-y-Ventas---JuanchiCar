@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Mail, Lock, Eye, EyeOff, Wrench, Package, Receipt, Users, Loader2 } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { loginSchema, type LoginFormData } from "@/schemas/auth"
@@ -25,18 +26,6 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginFormData) {
     setAuthError(null)
-
-    // Bypass para el admin mockeado en desarrollo
-    const mockEmail = process.env.NEXT_PUBLIC_MOCK_ADMIN_EMAIL
-    const mockPassword = process.env.NEXT_PUBLIC_MOCK_ADMIN_PASSWORD
-
-    if (data.email === mockEmail && data.password === mockPassword) {
-      // Seteamos una cookie para que el middleware nos deje pasar
-      document.cookie = "mock-auth=true; path=/; max-age=86400"
-      router.push("/dashboard")
-      router.refresh()
-      return
-    }
 
     const supabase = createClient()
 
@@ -80,31 +69,19 @@ export default function LoginPage() {
           <rect width="100%" height="100%" fill="url(#gears)" />
         </svg>
 
-        {/* Logo y tagline */}
-        <div className="animate-fade-in-left relative z-10 flex-1 flex flex-col items-center justify-center">
-          <Wrench className="size-12 text-white mb-4" />
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            Gestor de Stock
+        {/* Logo y título */}
+        <div className="animate-fade-in-left relative z-10 flex-1 flex flex-col items-center justify-center -mt-10">
+          <Image
+            src="/images/logo1.png"
+            alt="JuanchiCar Logo"
+            width={400}
+            height={150}
+            priority
+            className="mb-8 w-full max-w-[400px] h-auto object-contain drop-shadow-lg"
+          />
+          <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight text-center">
+            Gestor Stock y Ventas
           </h1>
-          <p className="text-sm text-white/70 mt-2 text-center">
-            Control total de tu taller, en un solo lugar
-          </p>
-        </div>
-
-        {/* Bullet points */}
-        <div className="animate-fade-in-left animation-delay-200 relative z-10 space-y-3 pb-6">
-          <div className="flex items-center gap-3">
-            <Package className="size-4 shrink-0" style={{ color: "#60A5FA" }} />
-            <span className="text-sm text-white/80">Inventario en tiempo real</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Receipt className="size-4 shrink-0" style={{ color: "#60A5FA" }} />
-            <span className="text-sm text-white/80">Registro de ventas</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Users className="size-4 shrink-0" style={{ color: "#60A5FA" }} />
-            <span className="text-sm text-white/80">Historial de clientes</span>
-          </div>
         </div>
       </div>
 

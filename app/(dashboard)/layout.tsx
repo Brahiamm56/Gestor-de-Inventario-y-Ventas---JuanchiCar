@@ -10,13 +10,8 @@ export default async function DashboardLayout({
   const supabase = await createClient()
 
   // Obtener cantidad de productos con stock bajo para notificaciones
-  const { data: productos } = await supabase
-    .from("productos")
-    .select("stock, stock_minimo")
-
-  const stockBajoCount = (productos ?? []).filter(
-    (p) => p.stock <= p.stock_minimo
-  ).length
+  const { data: count } = await supabase.rpc("get_stock_bajo_count")
+  const stockBajoCount = count ?? 0
 
   return (
     <StockNotificationProvider stockBajoCount={stockBajoCount}>

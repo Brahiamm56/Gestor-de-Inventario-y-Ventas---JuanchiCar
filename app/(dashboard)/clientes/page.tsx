@@ -1,30 +1,35 @@
-import { Users } from "lucide-react"
+import { UserCheck } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import ClienteTable from "@/components/clientes/ClienteTable"
-import type { Cliente, Auto } from "@/types/database"
+import type { Cliente, Auto, TurnoTaller } from "@/types/database"
 
 export default async function ClientesPage() {
   const supabase = await createClient()
 
-  const [clientesResult, autosResult, ventasResult] = await Promise.all([
+  const [clientesResult, autosResult, ventasResult, turnosResult] = await Promise.all([
     supabase.from("clientes").select("*").order("nombre"),
     supabase.from("autos").select("*"),
     supabase
       .from("ventas")
       .select("*, autos(patente)")
       .order("fecha", { ascending: false }),
+    supabase
+      .from("turnos_taller")
+      .select("*")
+      .order("fecha_turno", { ascending: false }),
   ])
 
   const clientes = (clientesResult.data ?? []) as Cliente[]
   const autos = (autosResult.data ?? []) as Auto[]
   const ventas = ventasResult.data ?? []
+  const turnos = (turnosResult.data ?? []) as TurnoTaller[]
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="animate-fade-in-down">
         <div className="flex items-center gap-3 mb-1">
           <div className="p-2 rounded-lg" style={{ backgroundColor: "#D1FAE5" }}>
-            <Users className="size-5" style={{ color: "#059669" }} />
+            <UserCheck className="size-5" style={{ color: "#059669" }} />
           </div>
           <div>
             <h1 className="text-2xl font-bold" style={{ color: "#0F172A" }}>
@@ -50,6 +55,7 @@ export default async function ClientesPage() {
           clientes={clientes}
           autos={autos}
           ventas={ventas as Parameters<typeof ClienteTable>[0]["ventas"]}
+          turnos={turnos}
         />
       </div>
     </div>

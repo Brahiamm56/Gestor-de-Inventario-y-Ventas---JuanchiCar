@@ -5,6 +5,35 @@ import { createClient } from "@/lib/supabase/server"
 import { turnoSchema } from "@/schemas/turno"
 import type { EstadoTurno } from "@/types/database"
 
+// Crea un auto rápido (opcionalmente sin cliente) para usarse al crear un turno
+export async function crearAutoRapido(
+  clienteId: string | null,
+  vehiculo: { patente: string; marca?: string; modelo?: string; anio?: number }
+) {
+  if (!vehiculo.patente) return { error: "La patente es obligatoria" }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("autos")
+    .insert({
+      cliente_id: clienteId || null,
+      patente: vehiculo.patente.toUpperCase(),
+      marca: vehiculo.marca || null,
+      modelo: vehiculo.modelo || null,
+      anio: vehiculo.anio ?? null,
+    })
+    .select("id")
+    .single()
+
+  if (error) {
+    if (error.code === "23505") return { error: "Ya existe un vehículo con esa patente" }
+    return { error: "Error al registrar el vehículo" }
+  }
+
+  revalidatePath("/clientes")
+  return { success: true, autoId: data.id }
+}
+
 export async function crearTurno(formData: unknown) {
     const parsed = turnoSchema.safeParse(formData)
     if (!parsed.success) {

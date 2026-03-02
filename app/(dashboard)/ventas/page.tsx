@@ -1,4 +1,4 @@
-import { Receipt, Wallet, CalendarDays, TrendingUp } from "lucide-react"
+import { ShoppingCart, CreditCard, CalendarDays, TrendingUp } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import VentaTable from "@/components/ventas/VentaTable"
 import { formatARS } from "@/lib/utils"
@@ -45,7 +45,7 @@ export default async function VentasPage() {
       <div className="animate-fade-in-down">
         <div className="flex items-center gap-3 mb-1">
           <div className="p-2 rounded-lg bg-blue-100">
-            <Receipt className="size-5 text-blue-600" />
+            <ShoppingCart className="size-5 text-blue-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-slate-900">
@@ -63,7 +63,7 @@ export default async function VentasPage() {
         <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-blue-50 rounded-lg">
-              <Wallet className="size-5 text-blue-600" />
+              <CreditCard className="size-5 text-blue-600" />
             </div>
             <div>
               <p className="text-sm font-medium text-slate-500">Ventas Totales</p>

@@ -1,0 +1,169 @@
+
+> gestor-stock@0.1.0 lint
+> eslint
+
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\app\(dashboard)\dashboard\page.tsx
+    5:3  warning  'CheckCircle' is defined but never used           @typescript-eslint/no-unused-vars
+   80:5  warning  'stockResult' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  131:9  warning  'ingresosMes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\app\(dashboard)\taller\page.tsx
+  1:39  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\check_db.js
+  1:15  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\clientes\AutoModal.tsx
+  40:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\clientes\ClienteTable.tsx
+  87:47  warning  React Hook useEffect has a missing dependency: 'pagination'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\compras\CompraModal.tsx
+  44:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\compras\CompraModal.tsx:44:7
+  42 |   useEffect(() => {
+  43 |     if (!open) {
+> 44 |       setProveedorId("")
+     |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  45 |       setNotas("")
+  46 |       setItems([])
+  47 |       setError("")  react-hooks/set-state-in-effect
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\dashboard\DashboardCharts.tsx
+  206:6   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  253:69  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\layout\Navbar.tsx
+  13:3  warning  'Settings' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  53:5  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\layout\Navbar.tsx:53:5
+  51 |
+  52 |   useEffect(() => {
+> 53 |     setDateStr(formatDateLong())
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  54 |   }, [])
+  55 |   const stockBajoCount = useNotificationStore((s) => s.stockBajoCount)
+  56 |  react-hooks/set-state-in-effect
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\proveedores\ProveedorTable.tsx
+  47:47  warning  React Hook useEffect has a missing dependency: 'pagination'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\shared\SearchDialog.tsx
+   5:51  warning  'ShoppingBag' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  63:7   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\shared\SearchDialog.tsx:63:7
+  61 |   useEffect(() => {
+  62 |     if (!debouncedQuery || debouncedQuery.length < 2) {
+> 63 |       setResults([])
+     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  64 |       return
+  65 |     }
+  66 |  react-hooks/set-state-in-effect
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\stock\ProductoModal.tsx
+   60:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+   74:25  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\stock\ProductoModal.tsx:74:25
+  72 |   })
+  73 |
+> 74 |   const categoryValue = watch("categoria")
+     |                         ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  75 |   const proveedorValue = watch("proveedor_id")
+  76 |
+  77 |   useEffect(() => {  react-hooks/incompatible-library
+  118:59  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+  119:44  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-explicit-any
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\stock\ProductoTable.tsx
+  92:47  warning  React Hook useEffect has a missing dependency: 'pagination'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\taller\TurnoModal.tsx
+    6:31  warning  'CalendarIcon' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+    7:10  warning  'format' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+    8:10  warning  'es' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  128:40  warning  Compilation Skipped: Use of incompatible library
+
+This API returns functions which cannot be memoized without leading to stale UI. To prevent this, by default React Compiler will skip memoizing this component/hook. However, you may see issues if values from this API are passed to other components/hooks that are memoized.
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\taller\TurnoModal.tsx:128:40
+  126 |                             <Label>Cliente</Label>
+  127 |                             <Select
+> 128 |                                 value={watch("cliente_id") || "none"}
+      |                                        ^^^^^ React Hook Form's `useForm()` API returns a `watch()` function which cannot be memoized safely.
+  129 |                                 onValueChange={(v) => {
+  130 |                                     const val = v === "none" ? "" : v
+  131 |                                     setValue("cliente_id", val)  react-hooks/incompatible-library
+  199:79  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\taller\TurnoTable.tsx
+  71:47  warning  React Hook useEffect has a missing dependency: 'pagination'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\ventas\VentaModal.tsx
+  64:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\ventas\VentaModal.tsx:64:7
+  62 |   useEffect(() => {
+  63 |     if (open && ventaEdit) {
+> 64 |       setClienteId(ventaEdit.cliente_id ?? "")
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  65 |       setAutoId(ventaEdit.auto_id ?? "")
+  66 |       setEstado(ventaEdit.estado === "cancelada" ? "presupuesto" : ventaEdit.estado)
+  67 |       setMetodoPago(ventaEdit.metodo_pago ?? "efectivo")  react-hooks/set-state-in-effect
+  84:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\ventas\VentaModal.tsx:84:7
+  82 |   useEffect(() => {
+  83 |     if (!ventaEdit) {
+> 84 |       setAutoId("")
+     |       ^^^^^^^^^ Avoid calling setState() directly within an effect
+  85 |     }
+  86 |   }, [clienteId, ventaEdit])
+  87 |                                                                                                                                                                                           react-hooks/set-state-in-effect
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\components\ventas\VentaTable.tsx
+  45:40  warning  'Venta' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\brahi\Desktop\ProyectosWeb\GestorStock\GestorStock\lib\pdf-generator.ts
+  209:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  410:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 31 problems (15 errors, 16 warnings)
+

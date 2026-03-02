@@ -1,4 +1,4 @@
-import { Wrench, Clock, CheckCircle2, AlertCircle } from "lucide-react"
+import { Car, Wrench, Clock, CheckCircle2 } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import TurnoTable from "@/components/taller/TurnoTable"
 import type { Cliente, Auto, TurnoConDetalles } from "@/types/database"
@@ -35,7 +35,7 @@ export default async function TallerPage() {
             <div className="animate-fade-in-down">
                 <div className="flex items-center gap-3 mb-1">
                     <div className="p-2 rounded-lg" style={{ backgroundColor: "#EDE9FE" }}>
-                        <Wrench className="size-5" style={{ color: "#7C3AED" }} />
+                        <Car className="size-5" style={{ color: "#7C3AED" }} />
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold" style={{ color: "#0F172A" }}>

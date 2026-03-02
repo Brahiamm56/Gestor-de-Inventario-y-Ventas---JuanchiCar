@@ -4,7 +4,12 @@
       "Bash(cd \"C:\\\\Users\\\\leanp\\\\OneDrive\\\\Escritorio\\\\GestorStock\" && npm run dev 2>&1)",
       "Bash(ls:*)",
       "Bash(npm install jspdf jspdf-autotable)",
-      "Bash(npm install --save-dev @types/jspdf)"
+      "Bash(npm install --save-dev @types/jspdf)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next:*)",
+      "Bash(find:*)",
+      "Bash(node:*)"
     ]
   }
 }

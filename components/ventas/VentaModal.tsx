@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect, useTransition } from "react"
-import { Loader2 } from "lucide-react"
+import { Loader2, Plus, Trash2, Wrench } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
@@ -23,7 +24,8 @@ import {
 import VentaItems from "./VentaItems"
 import { crearVenta, editarVenta } from "@/app/(dashboard)/ventas/actions"
 import type { Cliente, Auto, Producto } from "@/types/database"
-import type { VentaItemFormData } from "@/schemas/venta"
+import type { VentaItemFormData, ServicioItemFormData } from "@/schemas/venta"
+import { formatARS } from "@/lib/utils"
 
 interface VentaEditData {
   id: string
@@ -44,6 +46,17 @@ interface VentaModalProps {
   ventaEdit?: VentaEditData | null
 }
 
+// Parsea notas que puedan contener servicios codificados
+function parseNotas(notas: string | null): { notas: string; servicios: ServicioItemFormData[] } {
+  if (!notas || !notas.startsWith("__sv__")) return { notas: notas || "", servicios: [] }
+  try {
+    const data = JSON.parse(notas.slice(6))
+    return { notas: data.n || "", servicios: data.s || [] }
+  } catch {
+    return { notas, servicios: [] }
+  }
+}
+
 export default function VentaModal({ open, onClose, clientes, autos, productos, ventaEdit }: VentaModalProps) {
   const [isPending, startTransition] = useTransition()
   const [clienteId, setClienteId] = useState("")
@@ -52,6 +65,7 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
   const [metodoPago, setMetodoPago] = useState<"efectivo" | "transferencia" | "tarjeta">("efectivo")
   const [notas, setNotas] = useState("")
   const [items, setItems] = useState<VentaItemFormData[]>([])
+  const [servicios, setServicios] = useState<ServicioItemFormData[]>([])
   const [error, setError] = useState("")
 
   const isEditing = !!ventaEdit
@@ -65,8 +79,12 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
       setAutoId(ventaEdit.auto_id ?? "")
       setEstado(ventaEdit.estado === "cancelada" ? "presupuesto" : ventaEdit.estado)
       setMetodoPago(ventaEdit.metodo_pago ?? "efectivo")
-      setNotas(ventaEdit.notas ?? "")
       setItems(ventaEdit.items)
+
+      // Parsear servicios de notas
+      const parsed = parseNotas(ventaEdit.notas)
+      setNotas(parsed.notas)
+      setServicios(parsed.servicios)
     } else if (!open) {
       setClienteId("")
       setAutoId("")
@@ -74,23 +92,49 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
       setMetodoPago("efectivo")
       setNotas("")
       setItems([])
+      setServicios([])
       setError("")
     }
   }, [open, ventaEdit])
 
   // Resetear auto cuando cambia el cliente
   useEffect(() => {
-    if (!ventaEdit) {
-      setAutoId("")
-    }
+    if (!ventaEdit) setAutoId("")
   }, [clienteId, ventaEdit])
+
+  function addServicio() {
+    setServicios((prev) => [...prev, { descripcion: "", precio: 0 }])
+  }
+
+  function updateServicio(index: number, field: keyof ServicioItemFormData, value: string | number) {
+    setServicios((prev) => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: value }
+      return updated
+    })
+  }
+
+  function removeServicio(index: number) {
+    setServicios((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const totalProductos = items.reduce((sum, item) => sum + item.cantidad * item.precio_unitario, 0)
+  const totalServicios = servicios.reduce((sum, s) => sum + Number(s.precio || 0), 0)
+  const totalGeneral = totalProductos + totalServicios
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
 
-    if (items.length === 0) {
-      setError("Agregá al menos un producto")
+    if (items.length === 0 && servicios.length === 0) {
+      setError("Agregá al menos un producto o servicio")
+      return
+    }
+
+    // Validar servicios
+    const serviciosInvalidos = servicios.some((s) => !s.descripcion.trim())
+    if (serviciosInvalidos) {
+      setError("Todos los servicios deben tener una descripción")
       return
     }
 
@@ -102,6 +146,7 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
         metodo_pago: metodoPago,
         notas: notas || undefined,
         items,
+        servicios: servicios.length > 0 ? servicios : undefined,
       }
 
       const result = isEditing
@@ -119,7 +164,7 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Editar Presupuesto" : "Nueva Venta"}</DialogTitle>
         </DialogHeader>
@@ -189,7 +234,84 @@ export default function VentaModal({ open, onClose, clientes, autos, productos, 
             </div>
           </div>
 
+          {/* Productos */}
           <VentaItems items={items} onChange={setItems} productos={productos} />
+
+          {/* Servicios y Trabajos */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium flex items-center gap-1.5" style={{ color: "#0F172A" }}>
+                <Wrench className="size-3.5 text-slate-500" />
+                Servicios y Trabajos ({servicios.length})
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addServicio}
+              >
+                <Plus className="size-3.5" />
+                Agregar servicio
+              </Button>
+            </div>
+
+            {servicios.length > 0 && (
+              <div className="space-y-2">
+                {servicios.map((servicio, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-2 rounded-lg border border-amber-100 bg-amber-50/40"
+                  >
+                    <Wrench className="size-3.5 text-amber-500 shrink-0" />
+                    <Input
+                      placeholder="Descripción del trabajo (ej: Cambio de aceite)"
+                      value={servicio.descripcion}
+                      onChange={(e) => updateServicio(index, "descripcion", e.target.value)}
+                      className="flex-1 h-7 text-sm border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1"
+                    />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      placeholder="Precio"
+                      value={servicio.precio || ""}
+                      onChange={(e) => updateServicio(index, "precio", parseFloat(e.target.value) || 0)}
+                      className="w-28 h-7 text-sm text-right"
+                    />
+                    <span className="text-sm font-medium w-24 text-right" style={{ color: "#0F172A" }}>
+                      {formatARS(Number(servicio.precio || 0))}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => removeServicio(index)}
+                    >
+                      <Trash2 className="size-3.5 text-red-500" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Total general (cuando hay servicios) */}
+          {servicios.length > 0 && (
+            <div className="rounded-lg border border-slate-200 p-3 bg-slate-50 space-y-1">
+              <div className="flex justify-between text-sm text-slate-500">
+                <span>Productos</span>
+                <span>{formatARS(totalProductos)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-slate-500">
+                <span>Servicios</span>
+                <span>{formatARS(totalServicios)}</span>
+              </div>
+              <div className="flex justify-between text-base font-bold text-slate-900 pt-1 border-t border-slate-200">
+                <span>Total</span>
+                <span>{formatARS(totalGeneral)}</span>
+              </div>
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label>Notas</Label>

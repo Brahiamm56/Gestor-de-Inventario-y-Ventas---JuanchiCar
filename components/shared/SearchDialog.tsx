@@ -6,6 +6,7 @@ import { Search, Package, Users, Receipt, Wrench, ShoppingBag, Loader2 } from "l
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
@@ -144,6 +145,7 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden">
+        <DialogTitle className="sr-only">Buscar contenido</DialogTitle>
         <div className="flex items-center border-b border-slate-200 px-4">
           <Search className="size-4 text-slate-400 shrink-0" />
           <Input

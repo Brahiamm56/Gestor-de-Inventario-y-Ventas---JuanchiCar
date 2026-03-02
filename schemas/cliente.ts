@@ -3,7 +3,6 @@ import { z } from "zod"
 export const clienteSchema = z.object({
   nombre: z.string().min(1, "El nombre es obligatorio"),
   telefono: z.string().optional(),
-  email: z.string().email("Email inválido").optional().or(z.literal("")),
 })
 
 export const autoSchema = z.object({

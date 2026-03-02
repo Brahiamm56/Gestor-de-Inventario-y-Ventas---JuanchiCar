@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import Image from "next/image"
 import {
   Wrench,
   LogOut,
@@ -71,11 +72,8 @@ export default function Navbar() {
         className="fixed top-0 left-0 right-0 z-50 h-[60px] flex items-center justify-between px-6 bg-[#1E3A5F] text-white"
       >
         {/* Logo */}
-        <div className="flex items-center gap-2 mr-4">
-          <Wrench className="size-5 text-white" />
-          <span className="text-white font-bold text-base sm:text-lg whitespace-nowrap">
-            {settings.name}
-          </span>
+        <div className="flex items-center mr-4">
+          <Image src="/images/logo1.png" alt="JuanchiCar Logo" width={160} height={50} priority className="object-contain" />
         </div>
 
         {/* Links de navegación — Desktop */}

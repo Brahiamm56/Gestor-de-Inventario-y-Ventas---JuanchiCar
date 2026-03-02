@@ -4,14 +4,25 @@ import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 import { ventaSchema } from "@/schemas/venta"
 
+// Codifica servicios en el campo notas para no requerir migración de DB
+function encodeNotasConServicios(
+  notas: string | undefined,
+  servicios: { descripcion: string; precio: number }[] | undefined
+): string | null {
+  if (!servicios || servicios.length === 0) return notas || null
+  return `__sv__${JSON.stringify({ s: servicios, n: notas || "" })}`
+}
+
 export async function crearVenta(formData: unknown) {
   const parsed = ventaSchema.safeParse(formData)
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message }
   }
 
-  const { items, ...ventaData } = parsed.data
-  const total = items.reduce((sum, item) => sum + item.cantidad * item.precio_unitario, 0)
+  const { items, servicios, ...ventaData } = parsed.data
+  const totalProductos = items.reduce((sum, item) => sum + item.cantidad * item.precio_unitario, 0)
+  const totalServicios = (servicios ?? []).reduce((sum, s) => sum + s.precio, 0)
+  const total = totalProductos + totalServicios
 
   const supabase = await createClient()
 
@@ -23,7 +34,7 @@ export async function crearVenta(formData: unknown) {
       auto_id: ventaData.auto_id || null,
       estado: ventaData.estado,
       metodo_pago: ventaData.metodo_pago || null,
-      notas: ventaData.notas || null,
+      notas: encodeNotasConServicios(ventaData.notas, servicios),
       total,
     })
     .select("id")
@@ -33,19 +44,20 @@ export async function crearVenta(formData: unknown) {
     return { error: "Error al crear la venta" }
   }
 
-  // Crear los items
-  const ventaItems = items.map((item) => ({
-    venta_id: venta.id,
-    producto_id: item.producto_id,
-    cantidad: item.cantidad,
-    precio_unitario: item.precio_unitario,
-  }))
+  // Crear los items de productos
+  if (items.length > 0) {
+    const ventaItems = items.map((item) => ({
+      venta_id: venta.id,
+      producto_id: item.producto_id,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+    }))
 
-  const { error: itemsError } = await supabase.from("venta_items").insert(ventaItems)
-  if (itemsError) {
-    // Rollback: eliminar la venta creada
-    await supabase.from("ventas").delete().eq("id", venta.id)
-    return { error: "Error al crear los items de la venta" }
+    const { error: itemsError } = await supabase.from("venta_items").insert(ventaItems)
+    if (itemsError) {
+      await supabase.from("ventas").delete().eq("id", venta.id)
+      return { error: "Error al crear los items de la venta" }
+    }
   }
 
   // Si es confirmada, descontar stock
@@ -201,8 +213,10 @@ export async function editarVenta(ventaId: string, formData: unknown) {
     return { error: parsed.error.issues[0].message }
   }
 
-  const { items, ...ventaData } = parsed.data
-  const total = items.reduce((sum, item) => sum + item.cantidad * item.precio_unitario, 0)
+  const { items, servicios, ...ventaData } = parsed.data
+  const totalProductos = items.reduce((sum, item) => sum + item.cantidad * item.precio_unitario, 0)
+  const totalServicios = (servicios ?? []).reduce((sum, s) => sum + s.precio, 0)
+  const total = totalProductos + totalServicios
 
   const supabase = await createClient()
 
@@ -226,7 +240,7 @@ export async function editarVenta(ventaId: string, formData: unknown) {
       auto_id: ventaData.auto_id || null,
       estado: ventaData.estado,
       metodo_pago: ventaData.metodo_pago || null,
-      notas: ventaData.notas || null,
+      notas: encodeNotasConServicios(ventaData.notas, servicios),
       total,
     })
     .eq("id", ventaId)
@@ -236,15 +250,17 @@ export async function editarVenta(ventaId: string, formData: unknown) {
   // Eliminar items anteriores y crear los nuevos
   await supabase.from("venta_items").delete().eq("venta_id", ventaId)
 
-  const ventaItems = items.map((item) => ({
-    venta_id: ventaId,
-    producto_id: item.producto_id,
-    cantidad: item.cantidad,
-    precio_unitario: item.precio_unitario,
-  }))
+  if (items.length > 0) {
+    const ventaItems = items.map((item) => ({
+      venta_id: ventaId,
+      producto_id: item.producto_id,
+      cantidad: item.cantidad,
+      precio_unitario: item.precio_unitario,
+    }))
 
-  const { error: itemsError } = await supabase.from("venta_items").insert(ventaItems)
-  if (itemsError) return { error: "Error al actualizar los items" }
+    const { error: itemsError } = await supabase.from("venta_items").insert(ventaItems)
+    if (itemsError) return { error: "Error al actualizar los items" }
+  }
 
   // Si cambia a confirmada, descontar stock
   if (ventaData.estado === "confirmada") {

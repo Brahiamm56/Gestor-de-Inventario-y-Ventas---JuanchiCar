@@ -1,4 +1,4 @@
-import { ShoppingBag, TrendingDown, Package } from "lucide-react"
+import { ClipboardList, TrendingDown, Package } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import CompraTable from "@/components/compras/CompraTable"
 import { formatARS } from "@/lib/utils"
@@ -32,7 +32,7 @@ export default async function ComprasPage() {
       <div className="animate-fade-in-down">
         <div className="flex items-center gap-3 mb-1">
           <div className="p-2 rounded-lg bg-orange-100">
-            <ShoppingBag className="size-5 text-orange-600" />
+            <ClipboardList className="size-5 text-orange-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-slate-900">
@@ -62,7 +62,7 @@ export default async function ComprasPage() {
         <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-blue-500">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-blue-50 rounded-lg">
-              <ShoppingBag className="size-5 text-blue-600" />
+              <ClipboardList className="size-5 text-blue-600" />
             </div>
             <div>
               <p className="text-sm font-medium text-slate-500">Compras del Mes</p>

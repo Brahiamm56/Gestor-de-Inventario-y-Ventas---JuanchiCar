@@ -36,7 +36,7 @@ export default function ClienteModal({ open, onClose, cliente }: ClienteModalPro
     formState: { errors },
   } = useForm<ClienteFormData>({
     resolver: zodResolver(clienteSchema),
-    defaultValues: { nombre: "", telefono: "", email: "" },
+    defaultValues: { nombre: "", telefono: "" },
   })
 
   useEffect(() => {
@@ -44,10 +44,9 @@ export default function ClienteModal({ open, onClose, cliente }: ClienteModalPro
       reset({
         nombre: cliente.nombre,
         telefono: cliente.telefono ?? "",
-        email: cliente.email ?? "",
       })
     } else {
-      reset({ nombre: "", telefono: "", email: "" })
+      reset({ nombre: "", telefono: "" })
     }
   }, [cliente, reset])
 
@@ -82,12 +81,6 @@ export default function ClienteModal({ open, onClose, cliente }: ClienteModalPro
           <div className="space-y-1.5">
             <Label htmlFor="telefono">Teléfono</Label>
             <Input id="telefono" placeholder="Ej: 11-1234-5678" {...register("telefono")} />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="email@ejemplo.com" {...register("email")} />
-            {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
           </div>
 
           <div className="flex justify-end gap-2 pt-2">

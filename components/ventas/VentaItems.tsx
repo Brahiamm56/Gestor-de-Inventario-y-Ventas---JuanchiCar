@@ -94,12 +94,35 @@ export default function VentaItems({ items, onChange, productos }: VentaItemsPro
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5" style={{ color: "#94A3B8" }} />
             <Input
-              placeholder="Buscar producto..."
+              placeholder="Escanear código o buscar nombre..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 h-8 text-sm"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  const scannedCode = searchTerm.trim().toLowerCase()
+                  if (!scannedCode) return
+
+                  // Buscar coincidencia exacta de código
+                  const match = productos.find(
+                    (p) => p.codigo && p.codigo.toLowerCase() === scannedCode
+                  )
+
+                  if (match) {
+                    addItem(match)
+                  }
+                  // Si no hay match exacto con código, la lista de abajo muestra resultados
+                  // de búsqueda parcial, así que no borramos el campo caso contrario.
+                }
+              }}
+              className="pl-8 h-8 text-sm focus-visible:ring-blue-500"
               autoFocus
             />
+          </div>
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-[10px] text-slate-400 bg-slate-100 rounded px-1.5 py-0.5 inline-flex items-center gap-1">
+              Escáner rápido activo
+            </span>
           </div>
           <div className="max-h-40 overflow-y-auto space-y-1">
             {filteredProductos.map((p) => (

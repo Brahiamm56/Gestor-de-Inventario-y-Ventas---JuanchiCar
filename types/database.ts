@@ -7,8 +7,10 @@ export interface Producto {
   precio_costo: number | null
   stock: number
   stock_minimo: number
+  ubicacion_fisica: string | null
   proveedor_id: string | null
   descripcion: string | null
+  is_active: boolean
   created_at: string
 }
 
@@ -22,7 +24,7 @@ export interface Cliente {
 
 export interface Auto {
   id: string
-  cliente_id: string
+  cliente_id: string | null
   patente: string
   marca: string | null
   modelo: string | null
@@ -107,4 +109,32 @@ export interface TurnoTaller {
 export interface TurnoConDetalles extends TurnoTaller {
   clientes: Pick<Cliente, "nombre"> | null
   autos: Pick<Auto, "patente" | "marca" | "modelo"> | null
+}
+
+export interface Database {
+  public: {
+    Tables: {
+      productos: { Row: Producto; Insert: Partial<Producto>; Update: Partial<Producto> }
+      clientes: { Row: Cliente; Insert: Partial<Cliente>; Update: Partial<Cliente> }
+      autos: { Row: Auto; Insert: Partial<Auto>; Update: Partial<Auto> }
+      ventas: { Row: Venta; Insert: Partial<Venta>; Update: Partial<Venta> }
+      venta_items: { Row: VentaItem; Insert: Partial<VentaItem>; Update: Partial<VentaItem> }
+      proveedores: { Row: Proveedor; Insert: Partial<Proveedor>; Update: Partial<Proveedor> }
+      compras: { Row: Compra; Insert: Partial<Compra>; Update: Partial<Compra> }
+      compra_items: { Row: CompraItem; Insert: Partial<CompraItem>; Update: Partial<CompraItem> }
+      turnos_taller: { Row: TurnoTaller; Insert: Partial<TurnoTaller>; Update: Partial<TurnoTaller> }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      get_stock_bajo_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+  }
 }
