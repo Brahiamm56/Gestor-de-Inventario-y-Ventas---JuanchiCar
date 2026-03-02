@@ -17,7 +17,7 @@ export default async function StockPage() {
 
   // Cálculos de KPIs
   const totalProductos = productos.length
-  const valorInventario = productos.reduce((acc, p) => acc + (Number(p.precio_costo ?? 0) * p.stock), 0)
+  const valorInventario = productos.reduce((acc, p) => acc + (Number(p.precio_venta) * p.stock), 0)
   const stockBajoCount = productos.filter(p => p.stock <= p.stock_minimo).length
 
   return (

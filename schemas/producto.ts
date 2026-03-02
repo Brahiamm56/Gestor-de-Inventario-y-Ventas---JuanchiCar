@@ -5,7 +5,6 @@ export const productoSchema = z.object({
   categoria: z.string().nullable().optional(),
   codigo: z.string().nullable().optional(),
   precio_venta: z.coerce.number().positive("El precio de venta debe ser mayor a 0"),
-  precio_costo: z.coerce.number().min(0, "El precio de costo no puede ser negativo").nullable().optional(),
   stock: z.coerce.number().int().min(0, "El stock no puede ser negativo"),
   stock_minimo: z.coerce.number().int().min(0, "El stock mínimo no puede ser negativo"),
   ubicacion_fisica: z.string().max(100, "La ubicación no puede superar los 100 caracteres").nullable().optional(),

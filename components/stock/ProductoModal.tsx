@@ -102,7 +102,6 @@ export default function ProductoModal({
       categoria: "",
       codigo: "",
       precio_venta: "" as unknown as number,
-      precio_costo: "" as unknown as number,
       stock: 0,
       stock_minimo: 5,
       ubicacion_fisica: "",
@@ -125,7 +124,6 @@ export default function ProductoModal({
         categoria: producto.categoria ?? "",
         codigo: producto.codigo ?? "",
         precio_venta: producto.precio_venta,
-        precio_costo: producto.precio_costo ?? (0 as unknown as number),
         stock: producto.stock,
         stock_minimo: producto.stock_minimo,
         ubicacion_fisica: producto.ubicacion_fisica ?? "",
@@ -139,7 +137,6 @@ export default function ProductoModal({
         categoria: SIN_CATEGORIA,
         codigo: "",
         precio_venta: "" as unknown as number,
-        precio_costo: "" as unknown as number,
         stock: 0,
         stock_minimo: 5,
         ubicacion_fisica: "",
@@ -409,21 +406,6 @@ export default function ProductoModal({
               />
               {errors.precio_venta && (
                 <p className="text-xs text-red-500">{errors.precio_venta.message}</p>
-              )}
-            </div>
-
-            {/* ── Precio Costo ── */}
-            <div className="space-y-1.5">
-              <Label htmlFor="precio_costo">Precio Costo</Label>
-              <Input
-                id="precio_costo"
-                type="number"
-                step="0.01"
-                placeholder="$ 0,00"
-                {...register("precio_costo")}
-              />
-              {errors.precio_costo && (
-                <p className="text-xs text-red-500">{errors.precio_costo.message}</p>
               )}
             </div>
 

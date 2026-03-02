@@ -70,7 +70,6 @@ export interface VentaConCliente extends Venta {
   items?: Array<{
     cantidad: number
     precio_unitario: number
-    productos: Pick<Producto, "precio_costo"> | null
   }>
 }
 

@@ -10,7 +10,7 @@ export default async function VentasPage() {
   const [ventasResult, clientesResult, autosResult, productosResult] = await Promise.all([
     supabase
       .from("ventas")
-      .select("*, clientes(nombre), autos(patente, marca, modelo), items:venta_items(cantidad, precio_unitario, productos(precio_costo))")
+      .select("*, clientes(nombre), autos(patente, marca, modelo), items:venta_items(cantidad, precio_unitario)")
       .order("fecha", { ascending: false }),
     supabase.from("clientes").select("*").order("nombre"),
     supabase.from("autos").select("*"),

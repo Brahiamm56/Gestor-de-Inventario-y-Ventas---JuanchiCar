@@ -17,7 +17,6 @@ export async function crearProducto(formData: unknown) {
     categoria: parsed.data.categoria || null,
     codigo: parsed.data.codigo || null,
     precio_venta: parsed.data.precio_venta,
-    precio_costo: parsed.data.precio_costo ?? null,
     stock: parsed.data.stock,
     stock_minimo: parsed.data.stock_minimo,
     ubicacion_fisica: parsed.data.ubicacion_fisica || null,
@@ -51,7 +50,6 @@ export async function editarProducto(id: string, formData: unknown) {
       categoria: parsed.data.categoria || null,
       codigo: parsed.data.codigo || null,
       precio_venta: parsed.data.precio_venta,
-      precio_costo: parsed.data.precio_costo ?? null,
       stock: parsed.data.stock,
       stock_minimo: parsed.data.stock_minimo,
       ubicacion_fisica: parsed.data.ubicacion_fisica || null,
@@ -140,7 +138,6 @@ export async function importarProductos(filas: ProductoParaImportar[]): Promise<
     codigo: string | null
     categoria: string | null
     precio_venta: number
-    precio_costo: number | null
     stock: number
     stock_minimo: number
     ubicacion_fisica: string | null
@@ -169,7 +166,6 @@ export async function importarProductos(filas: ProductoParaImportar[]): Promise<
       codigo: f.codigo ?? null,
       categoria: f.categoria ?? null,
       precio_venta: f.precio_venta,
-      precio_costo: f.precio_costo ?? null,
       stock: f.stock,
       stock_minimo: f.stock_minimo,
       ubicacion_fisica: f.ubicacion_fisica ?? null,

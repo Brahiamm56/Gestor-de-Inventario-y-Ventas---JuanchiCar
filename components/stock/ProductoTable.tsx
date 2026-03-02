@@ -99,7 +99,6 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
       { key: "codigo" as keyof Record<string, unknown>, label: "Código", format: (v) => String(v ?? "") },
       { key: "categoria" as keyof Record<string, unknown>, label: "Categoría", format: (v) => String(v ?? "") },
       { key: "precio_venta" as keyof Record<string, unknown>, label: "Precio Venta", format: (v) => String(v) },
-      { key: "precio_costo" as keyof Record<string, unknown>, label: "Precio Costo", format: (v) => String(v ?? "") },
       { key: "stock" as keyof Record<string, unknown>, label: "Stock" },
       { key: "stock_minimo" as keyof Record<string, unknown>, label: "Stock Mínimo" },
     ], "stock")
@@ -182,8 +181,6 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
                     <TableHead className="min-w-[90px] text-slate-500">Código</TableHead>
                     <TableHead className="min-w-[100px] text-slate-500">Categoría</TableHead>
                     <TableHead className="text-right min-w-[100px] text-slate-500">P. Venta</TableHead>
-                    <TableHead className="text-right min-w-[100px] text-slate-500">P. Costo</TableHead>
-                    <TableHead className="text-right min-w-[100px] text-slate-500">Ganancia</TableHead>
                     <TableHead className="text-center min-w-[70px] text-slate-500">Stock</TableHead>
                     <TableHead className="min-w-[80px] text-slate-500">Estado</TableHead>
                     <TableHead className="min-w-[110px] text-slate-500">Ubicación</TableHead>
@@ -194,7 +191,6 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
                 <TableBody>
                   {pagination.paginatedItems.map((producto) => {
                     const badge = getStockBadge(producto.stock, producto.stock_minimo)
-                    const ganancia = producto.precio_venta - (producto.precio_costo ?? 0)
 
                     return (
                       <TableRow key={producto.id} className="group hover:bg-slate-50/80 transition-colors">
@@ -209,12 +205,6 @@ export default function ProductoTable({ productos, proveedores }: ProductoTableP
                         </TableCell>
                         <TableCell className="text-right font-medium py-4 text-slate-900">
                           {formatARS(producto.precio_venta)}
-                        </TableCell>
-                        <TableCell className="text-right py-4 text-slate-500">
-                          {producto.precio_costo ? formatARS(producto.precio_costo) : "—"}
-                        </TableCell>
-                        <TableCell className="text-right py-4 font-medium text-emerald-600">
-                          {formatARS(ganancia)}
                         </TableCell>
                         <TableCell className="text-center font-medium py-4 text-slate-900">
                           {producto.stock}

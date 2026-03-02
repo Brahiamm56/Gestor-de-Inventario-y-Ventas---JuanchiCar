@@ -26,10 +26,9 @@ interface WeeklySalesData {
   total: number
 }
 
-interface IngresosGastosData {
+interface IngresosMensualesData {
   mes: string
   ingresos: number
-  gastos: number
 }
 
 interface MetodoPagoData {
@@ -78,21 +77,6 @@ function CustomTooltip({ active, payload, label }: ChartTooltipProps) {
   )
 }
 
-function IngresosGastosTooltip({ active, payload, label }: ChartTooltipProps) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="rounded-lg px-3 py-2 text-sm space-y-1 bg-card border border-border shadow-md">
-      <p className="font-medium text-card-foreground">{label}</p>
-      {payload.map((entry, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
-          <span className="text-muted-foreground">{formatCurrency(entry.value)}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 // -- Ventas Semanales (BarChart) --
 export function VentasSemanalesChart({ data }: { data: WeeklySalesData[] }) {
   return (
@@ -132,12 +116,12 @@ export function VentasSemanalesChart({ data }: { data: WeeklySalesData[] }) {
   )
 }
 
-// -- Ingresos vs Gastos (LineChart) --
-export function IngresosVsGastosChart({ data }: { data: IngresosGastosData[] }) {
+// -- Ingresos Mensuales (LineChart) --
+export function IngresosMensualesChart({ data }: { data: IngresosMensualesData[] }) {
   return (
     <div className="animate-fade-in-up animation-delay-300 p-5 bg-card border border-border rounded-xl shadow-sm">
       <h3 className="text-sm font-semibold mb-4 text-card-foreground">
-        Ingresos vs Gastos
+        Ingresos Mensuales
       </h3>
       <ResponsiveContainer width="100%" height={220}>
         <LineChart data={data}>
@@ -156,7 +140,7 @@ export function IngresosVsGastosChart({ data }: { data: IngresosGastosData[] }) 
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<IngresosGastosTooltip />} />
+          <Tooltip content={<CustomTooltip />} />
           <Line
             type="monotone"
             dataKey="ingresos"
@@ -167,17 +151,6 @@ export function IngresosVsGastosChart({ data }: { data: IngresosGastosData[] }) 
             animationBegin={200}
             animationDuration={1000}
             name="Ingresos"
-          />
-          <Line
-            type="monotone"
-            dataKey="gastos"
-            stroke="#94A3B8"
-            strokeWidth={2}
-            dot={{ fill: "#94A3B8", r: 3 }}
-            activeDot={{ r: 5 }}
-            animationBegin={400}
-            animationDuration={1000}
-            name="Gastos"
           />
         </LineChart>
       </ResponsiveContainer>

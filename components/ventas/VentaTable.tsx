@@ -257,18 +257,6 @@ export default function VentaTable({ ventas, clientes, autos, productos }: Venta
                 { key: "total" as keyof Record<string, unknown>, label: "Total", format: (v) => String(v) },
                 { key: "estado" as keyof Record<string, unknown>, label: "Estado" },
                 { key: "metodo_pago" as keyof Record<string, unknown>, label: "Método de Pago", format: (v) => metodoPagoLabels[String(v)] ?? "—" },
-                {
-                  key: "items" as keyof Record<string, unknown>,
-                  label: "Ganancia",
-                  format: (v) => {
-                    const items = (v as VentaConCliente["items"]) ?? []
-                    const totalProfit = items.reduce((acc, item) => {
-                      const cost = item.productos?.precio_costo ?? 0
-                      return acc + (item.precio_unitario - cost) * item.cantidad
-                    }, 0)
-                    return String(totalProfit)
-                  }
-                },
               ],
               "ventas"
             )
@@ -308,7 +296,6 @@ export default function VentaTable({ ventas, clientes, autos, productos }: Venta
                   <TableHead className="text-slate-500">Vehículo</TableHead>
                   <TableHead className="text-slate-500">Fecha</TableHead>
                   <TableHead className="text-right text-slate-500">Total</TableHead>
-                  <TableHead className="text-right text-slate-500">Ganancia</TableHead>
                   <TableHead className="text-slate-500">Estado</TableHead>
                   <TableHead className="text-slate-500">Pago</TableHead>
                   <TableHead className="text-right text-slate-500">Acciones</TableHead>
@@ -330,15 +317,6 @@ export default function VentaTable({ ventas, clientes, autos, productos }: Venta
                       </TableCell>
                       <TableCell className="text-right font-medium text-slate-900">
                         {formatARS(Number(venta.total))}
-                      </TableCell>
-                      <TableCell className="text-right text-emerald-600 font-medium">
-                        {(() => {
-                          const profit = (venta.items ?? []).reduce((acc, item) => {
-                            const cost = item.productos?.precio_costo ?? 0
-                            return acc + (item.precio_unitario - cost) * item.cantidad
-                          }, 0)
-                          return formatARS(profit)
-                        })()}
                       </TableCell>
                       <TableCell>
                         <Badge

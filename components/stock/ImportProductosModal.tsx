@@ -191,7 +191,6 @@ export default function ImportProductosModal({
         codigo: f.datos.codigo,
         categoria: f.datos.categoria,
         precio_venta: f.datos.precio_venta ?? 0,
-        precio_costo: f.datos.precio_costo,
         stock: f.datos.stock ?? 0,
         stock_minimo: f.datos.stock_minimo ?? 5,
         descripcion: f.datos.descripcion,

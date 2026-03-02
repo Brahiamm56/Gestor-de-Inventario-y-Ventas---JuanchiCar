@@ -13,7 +13,7 @@ import { createClient } from "@/lib/supabase/server"
 import { formatARS, getMonthName, timeAgo } from "@/lib/utils"
 import {
   VentasSemanalesChart,
-  IngresosVsGastosChart,
+  IngresosMensualesChart,
   MetodosPagoChart,
   RecentActivity,
 } from "@/components/dashboard/DashboardCharts"
@@ -196,30 +196,23 @@ export default async function DashboardPage() {
         .lte("fecha", month.end)
     )
   )
-  const ingresosVsGastos = last6.map((month, i) => {
+  const ingresosMensuales = last6.map((month, i) => {
     const ventasMonth = monthlyResults[i]
     return {
       mes: month.label,
       ingresos: (ventasMonth.data ?? []).reduce((s, v) => s + Number(v.total), 0),
-      gastos: 0,
     }
   })
 
   // Calcular variación vs mes anterior para ventas
-  const mesAnteriorIngresos = ingresosVsGastos.length >= 2 ? ingresosVsGastos[ingresosVsGastos.length - 2].ingresos : 0
-  const mesActualIngresos = ingresosVsGastos.length >= 1 ? ingresosVsGastos[ingresosVsGastos.length - 1].ingresos : 0
+  const mesAnteriorIngresos = ingresosMensuales.length >= 2 ? ingresosMensuales[ingresosMensuales.length - 2].ingresos : 0
+  const mesActualIngresos = ingresosMensuales.length >= 1 ? ingresosMensuales[ingresosMensuales.length - 1].ingresos : 0
   const variacionVentas = mesAnteriorIngresos > 0
     ? Math.round(((mesActualIngresos - mesAnteriorIngresos) / mesAnteriorIngresos) * 100)
     : 0
 
-  // Calcular ganancias totales
-  const mesActualGastos = ingresosVsGastos.length >= 1 ? ingresosVsGastos[ingresosVsGastos.length - 1].gastos : 0
-  const gananciasTotales = mesActualIngresos - mesActualGastos
-  const mesAnteriorGastos = ingresosVsGastos.length >= 2 ? ingresosVsGastos[ingresosVsGastos.length - 2].gastos : 0
-  const gananciaAnterior = mesAnteriorIngresos - mesAnteriorGastos
-  const variacionGanancias = gananciaAnterior > 0
-    ? Math.round(((gananciasTotales - gananciaAnterior) / gananciaAnterior) * 100)
-    : 0
+  // Contar ventas confirmadas del mes
+  const ventasConfirmadasCount = (ventasMesResult.data ?? []).length
 
   // Preparar actividad reciente (Ventas + Turnos)
   const activityItems = [
@@ -298,15 +291,14 @@ export default async function DashboardPage() {
       Icon: Wrench,
     },
     {
-      label: "Ganancias Totales",
-      value: formatARS(gananciasTotales),
-      detail: variacionGanancias >= 0
-        ? `+${variacionGanancias}% vs mes anterior`
-        : `${variacionGanancias}% vs mes anterior`,
-      detailColor: variacionGanancias >= 0 ? "#22C55E" : "#EF4444",
+      label: "Ventas Confirmadas",
+      value: `${ventasConfirmadasCount}`,
+      valueSuffix: " este mes",
+      detail: `${ventasConfirmadasCount > 0 ? "Actualizadas" : "Sin ventas aún"}`,
+      detailColor: "#22C55E",
       iconBg: "#DCFCE7",
       iconColor: "#22C55E",
-      Icon: TrendingUp,
+      Icon: CheckCircle,
     },
   ]
 
@@ -407,7 +399,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         <MetodosPagoChart data={metodosPagoData} />
         <VentasSemanalesChart data={ventasSemanales} />
-        <IngresosVsGastosChart data={ingresosVsGastos} />
+        <IngresosMensualesChart data={ingresosMensuales} />
         <RecentActivity items={allActivity} />
       </div>
     </div>
